@@ -1,0 +1,97 @@
+version: '3'
+services:
+  galaxy-nginx:
+    container_name: galaxy-nginx
+    image: nginx:latest
+    restart: always
+    ports:
+      - "8660:8660"
+    networks:
+      - galaxy-net
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/log:/var/log/nginx
+      - ./nginx/conf/conf.d:/etc/nginx/conf.d
+
+
+  galaxy-mysql:
+    container_name: galaxy-mysql
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3307:3306"
+    networks:
+      - galaxy-net
+    volumes:
+      - ./mysql7/conf.d:/etc/mysql/conf.d
+      - ./mysql7/logs:/var/log/mysql
+      - ./mysql7/data:/var/lib/mysql
+    command: [
+      'mysqld',
+      '--innodb-buffer-pool-size=80M',
+      '--character-set-server=utf8mb4',
+      '--collation-server=utf8mb4_unicode_ci',
+      '--default-time-zone=+8:00',
+      '--lower-case-table-names=1',
+      '--max_connections=40960'
+    ]
+    environment:
+      MYSQL_ROOT_PASSWORD: galaxy@pw@789
+
+
+  galaxy-redis:
+    container_name: galaxy-redis
+    image: redis:latest
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - galaxy-net
+    volumes:
+      - ./redis/conf/redis.conf:/etc/redis/redis.conf
+      - ./redis/data:/data
+    command: redis-server /etc/redis/redis.conf
+
+
+  mall4j-admin:
+    image: openjdk:17.0.2
+    container_name: mall4j-admin
+    restart: always
+    networks:
+      - galaxy-net
+    ports:
+      - 8085:8085
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./admin:/usr/local/jar
+    entrypoint: ["sh","-c" ,"java -jar -Xms512m -Xmx512m -Xss256k -XX:SurvivorRatio=8 -Dspring.profiles.active=docker /usr/local/jar/yami-shop-admin-0.0.1-SNAPSHOT.jar"]
+    depends_on:
+      - galaxy-redis
+      - galaxy-mysql
+
+  mall4j-api:
+    image: openjdk:17.0.2
+    container_name: mall4j-api
+    restart: always
+    networks:
+      - galaxy-net
+    ports:
+      - 8086:8086
+    env_file: .env
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./mall:/usr/local/jar
+    entrypoint: [ "sh","-c" ,"java -jar -Xms1024m -Xmx1024m -Xmn256m -Xss256k -XX:SurvivorRatio=8 -Dspring.profiles.active=docker /usr/local/jar/yami-shop-api-0.0.1-SNAPSHOT.jar"]
+    depends_on:
+      - galaxy-redis
+      - galaxy-mysql
+
+
+
+networks:
+  galaxy-net:
+    external: true

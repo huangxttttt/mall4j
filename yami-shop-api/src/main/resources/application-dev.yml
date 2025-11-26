@@ -2,9 +2,9 @@ server:
   port: 8086
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/yami_shops?allowMultiQueries=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
+    url: jdbc:mysql://192.168.174.129:3307/yami_shops?allowMultiQueries=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
     username: root
-    password: root
+    password: galaxy@pw@789
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.zaxxer.hikari.HikariDataSource
     hikari:
@@ -14,9 +14,10 @@ spring:
       connection-test-query: select 1
   data:
     redis:
-      host: 127.0.0.1
+      host: 192.168.174.129
       port: 6379
       database: 0
+      password: easymer@redis@2023
 logging:
   config: classpath:logback/logback-dev.xml
 

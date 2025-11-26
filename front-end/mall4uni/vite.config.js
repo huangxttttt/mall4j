@@ -6,6 +6,7 @@ import h5ProdEffectPlugin from 'uni-vite-plugin-h5-prod-effect'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/mall/',
   plugins: [
     uni(),
     AutoImport({
@@ -28,7 +29,14 @@ export default defineConfig({
   server: {
     host: true,
     port: 80,
-    open: true
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8086',
+        changeOrigin: true,
+        rewrite: path => path.replace(/^\/api/, '/api')
+      }
+    }
   },
   resolve: {
     alias: {

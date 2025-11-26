@@ -17,5 +17,6 @@ spring:
       host: ${REDIS_HOST:mall4j-redis}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DATABASE:0}
+      password: ${REDIS_PASSWORD:easymer@redis@2023}
 logging:
   config: classpath:logback/logback-prod.xml

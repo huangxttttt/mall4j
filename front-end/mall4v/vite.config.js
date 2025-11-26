@@ -13,6 +13,7 @@ import eslintPlugin from 'vite-plugin-eslint'
 // https://vitejs.dev/config/
 export default defineConfig(({ command })=> {
   return {
+    base: '/admin/',
     plugins: [
       vue(),
       createSvgIconsPlugin({
@@ -55,7 +56,14 @@ export default defineConfig(({ command })=> {
     server: {
       host: true,
       port: 9527,
-      open: true
+      open: true,
+      proxy: {
+        '/api': {
+          target: 'http://127.0.0.1:8085', // 后端地址
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/api/, '/api')
+        }
+      }
     },
     resolve: {
       alias: {
