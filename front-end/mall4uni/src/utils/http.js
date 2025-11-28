@@ -41,6 +41,9 @@ const http = {
           }
           // A00004 未授权
           if (responseData.code === 'A00004') {
+            // 先把所有 loading 关掉，避免遮住登录页
+            uni.hideLoading()
+            uni.hideNavigationBarLoading && uni.hideNavigationBarLoading()
             // 重设登录后跳转地址
             loginMethods.setRouteUrlAfterLogin()
             uni.removeStorageSync('expiresTimeStamp')
@@ -58,12 +61,10 @@ const http = {
                       url: '/pages/accountLogin/accountLogin'
                     })
                   } else {
-                    const router = getCurrentPages()
-                    if (router[0].route === 'pages/basket/basket') {
-                      uni.switchTab({
-                        url: '/pages/index/index'
-                      })
-                    }
+                    // 点击取消 -> 无条件返回首页
+                    uni.switchTab({
+                      url: '/pages/index/index'
+                    })
                   }
                 }
               })
@@ -85,16 +86,15 @@ const http = {
           // A04001 社交账号未绑定
           // A00012 tempUid错误
           // A00006 验证码错误
-          if (responseData.code === 'A04001' || responseData.code === 'A00001' || responseData.code === 'A00012' || responseData.code === 'A00006') {
+          // 其他异常码统一处理
+          if (responseData.code !== '00000' && responseData.code !== 'A00002' && responseData.code !== 'A00004') {
+            // 如果调用方没有自己 catch，就默认弹个错误提示
             if (!params.hasCatch) {
               uni.showToast({
-                title: responseData.msg || responseData.data || 'Error',
+                title: responseData.msg || responseData.data || '请求失败',
                 icon: 'none'
               })
             }
-          }
-
-          if (responseData.code !== '00000') {
             reject(responseData)
           }
         },

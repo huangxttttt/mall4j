@@ -269,25 +269,25 @@ onShow(() => {
 const toDistCenter = () => {
   uni.showToast({
     icon: 'none',
-    title: '该功能未开源'
+    title: '该功能待开放'
   })
 }
 const toCouponCenter = () => {
   uni.showToast({
     icon: 'none',
-    title: '该功能未开源'
+    title: '该功能待开放'
   })
 }
 const toMyCouponPage = () => {
   uni.showToast({
     icon: 'none',
-    title: '该功能未开源'
+    title: '该功能待开放'
   })
 }
 const handleTips = () => {
   uni.showToast({
     icon: 'none',
-    title: '该功能未开源'
+    title: '该功能待开放'
   })
 }
 const toAddressList = () => {

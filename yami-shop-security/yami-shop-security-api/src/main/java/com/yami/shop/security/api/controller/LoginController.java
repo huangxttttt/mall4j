@@ -1,5 +1,8 @@
 package com.yami.shop.security.api.controller;
 
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yami.shop.bean.model.User;
 import com.yami.shop.common.exception.YamiShopBindException;
@@ -41,10 +44,19 @@ public class LoginController {
     @Autowired
     private PasswordManager passwordManager;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     @PostMapping("/login")
     @Operation(summary = "账号密码(用于前端登录)" , description = "通过账号/手机号/用户名密码登录，还要携带用户的类型，也就是用户所在的系统")
     public ServerResponseEntity<TokenInfoVO> login(
             @Valid @RequestBody AuthenticationDTO authenticationDTO) {
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(authenticationDTO.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        if (!response.isSuccess()) {
+            return ServerResponseEntity.showFailMsg("验证码有误或已过期");
+        }
         String mobileOrUserName = authenticationDTO.getUserName();
         User user = getUser(mobileOrUserName);
 

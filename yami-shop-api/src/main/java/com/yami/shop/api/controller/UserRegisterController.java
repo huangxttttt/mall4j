@@ -3,6 +3,9 @@ package com.yami.shop.api.controller;
 
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
+import com.anji.captcha.model.common.ResponseModel;
+import com.anji.captcha.model.vo.CaptchaVO;
+import com.anji.captcha.service.CaptchaService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yami.shop.bean.model.User;
 import com.yami.shop.bean.param.UserRegisterParam;
@@ -17,6 +20,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import com.yami.shop.common.response.ServerResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,12 +43,21 @@ public class UserRegisterController {
     private final PasswordEncoder passwordEncoder;
 
     private final TokenStore tokenStore;
+    @Autowired
+    private CaptchaService captchaService;
 
     private final PasswordManager passwordManager;
 
     @PostMapping("/register")
     @Operation(summary = "注册" , description = "用户注册或绑定手机号接口")
     public ServerResponseEntity<TokenInfoVO> register(@Valid @RequestBody UserRegisterParam userRegisterParam) {
+        CaptchaVO captchaVO = new CaptchaVO();
+        captchaVO.setCaptchaVerification(userRegisterParam.getCaptchaVerification());
+        ResponseModel response = captchaService.verification(captchaVO);
+        if (!response.isSuccess()) {
+            return ServerResponseEntity.showFailMsg("验证码有误或已过期");
+        }
+
         if (StrUtil.isBlank(userRegisterParam.getNickName())) {
             userRegisterParam.setNickName(userRegisterParam.getUserName());
         }

@@ -46,4 +46,7 @@ public class UserRegisterParam {
 
 	@Schema(description = "用户id" )
 	private Long userId;
+
+	@Schema(description = "验证码" ,requiredMode = Schema.RequiredMode.REQUIRED)
+	private String captchaVerification;
 }

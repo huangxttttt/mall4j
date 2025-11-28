@@ -37,4 +37,8 @@ public class AuthenticationDTO {
     @Schema(description = "一般用作密码" ,requiredMode = Schema.RequiredMode.REQUIRED)
     protected String passWord;
 
+
+    @Schema(description = "验证码" ,requiredMode = Schema.RequiredMode.REQUIRED)
+    private String captchaVerification;
+
 }

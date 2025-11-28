@@ -63,7 +63,7 @@
     <view>
       <button
         class="authorized-btn"
-        @tap="login"
+        @tap="dataFormSubmit"
       >
         登录
       </button>
@@ -74,12 +74,21 @@
         回到首页
       </button>
     </view>
+    <view>
+      <Verify
+        ref="verifyRef"
+        :captcha-type="'blockPuzzle'"
+        :mode="pop"
+        :img-size="{width:'330px',height:'155px'}"
+        @success="login"
+      />
+    </view>
   </view>
 </template>
 
 <script setup>
 import { encrypt } from '@/utils/crypto.js'
-
+import Verify from '@/components/verify/verify.vue'
 /**
  * 生命周期函数--监听页面显示
  */
@@ -92,6 +101,8 @@ onShow(() => {
 
 const principal = ref('') // 账号
 const errorTips = ref(0) // 错误提示
+const verifyRef = ref(null)
+
 watch(
   () => principal.value,
   () => {
@@ -112,25 +123,33 @@ const getInputVal = (e) => {
   }
 }
 
-/**
- * 登录
- */
-const login = () => {
+const dataFormSubmit = () => {
   if (principal.value.length == 0) {
     errorTips.value = 1
   } else if (credentials.value.length == 0) {
     errorTips.value = 2
   } else {
     errorTips.value = 0
+    verifyRef.value.show()
+  }
+}
+
+/**
+ * 登录
+ */
+const login = (verifyResult) => {
+    uni.showLoading()
     http.request({
       url: '/login',
       method: 'post',
       data: {
         userName: principal.value,
-        passWord: encrypt(credentials.value)
+        passWord: encrypt(credentials.value),
+        captchaVerification: verifyResult.captchaVerification
       }
     })
       .then(({ data }) => {
+        uni.hideLoading()
         http.loginSuccess(data, () => {
           uni.showToast({
             title: '登录成功',
@@ -144,9 +163,14 @@ const login = () => {
             }
           })
         })
+      }).catch(err => {
+      // 这里可以根据后端的 code 自己定制提示
+      const msg = err.msg || err.data || '账号或密码错误'
+      uni.showToast({
+        title: msg,
+        icon: 'none'
       })
-  }
-}
+    })}
 
 /**
  * 去注册

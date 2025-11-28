@@ -36,6 +36,7 @@
     "@dcloudio/uni-mp-weixin": "3.0.0-3080720230703001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-3080720230703001",
     "@uni-ui/code-ui": "1.5.3",
+    "axios": "^1.13.2",
     "big.js": "6.2.1",
     "crypto-js": "4.1.1",
     "js-base64": "3.7.7",

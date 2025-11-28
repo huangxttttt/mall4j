@@ -1,7 +1,7 @@
 <template>
   <view class="register">
     <view class="con">
-      <image src="@/static/logo.png" />
+      <image src="@/static/logo.png"/>
       <!-- 登录 -->
       <view class="login-form">
         <view :class="['item',errorTips==1? 'error':'']">
@@ -64,7 +64,7 @@
       <view>
         <button
           class="authorized-btn"
-          @tap="toRegister"
+          @tap="dataFormSubmit"
         >
           注册
         </button>
@@ -75,12 +75,22 @@
           回到首页
         </button>
       </view>
+      <view>
+        <Verify
+          ref="verifyRef"
+          :captcha-type="'blockPuzzle'"
+          :mode="pop"
+          :img-size="{width:'330px',height:'155px'}"
+          @success="toRegister"
+        />
+      </view>
     </view>
   </view>
 </template>
 
 <script setup>
-import { encrypt } from '@/utils/crypto.js'
+import {encrypt} from '@/utils/crypto.js'
+import Verify from '@/components/verify/verify.vue'
 
 /**
  * 生命周期函数--监听页面显示
@@ -94,6 +104,7 @@ onShow(() => {
 
 const principal = ref('') // 账号
 const credentials = ref('') // 密码
+const verifyRef = ref(null)
 /**
  * 输入框的值
  */
@@ -107,24 +118,29 @@ const getInputVal = (e) => {
 }
 
 const errorTips = ref(0) // 输入错误提示:  1账号输入  2密码输入
-/**
- * 注册
- */
-const toRegister = () => {
+
+const dataFormSubmit = () => {
   if (principal.value.length == 0) {
     errorTips.value = 1
   } else if (credentials.value.length == 0) {
     errorTips.value = 2
   } else {
     errorTips.value = 0
-
+    verifyRef.value.show()
+  }
+}
+  /**
+   * 注册
+   */
+  const toRegister = (verifyResult) => {
     uni.showLoading()
     http.request({
       url: '/user/register',
       method: 'post',
       data: {
         userName: principal.value,
-        passWord: encrypt(credentials.value)
+        passWord: encrypt(credentials.value),
+        captchaVerification: verifyResult.captchaVerification
       }
     })
       .then(() => {
@@ -140,25 +156,25 @@ const toRegister = () => {
           })
         }, 1800)
       })
-  }
-}
-/**
- * 去登陆
- */
-const toLogin = () => {
-  uni.navigateTo({
-    url: '/pages/accountLogin/accountLogin'
-  })
-}
 
-/**
- * 回到首页
- */
-const toIndex = () => {
-  uni.switchTab({
-    url: '/pages/index/index'
-  })
-}
+  }
+  /**
+   * 去登陆
+   */
+  const toLogin = () => {
+    uni.navigateTo({
+      url: '/pages/accountLogin/accountLogin'
+    })
+  }
+
+  /**
+   * 回到首页
+   */
+  const toIndex = () => {
+    uni.switchTab({
+      url: '/pages/index/index'
+    })
+  }
 </script>
 
 <style lang="scss" scoped>
